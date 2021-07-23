@@ -24,6 +24,7 @@ extern "C" {
 #include <odp_api.h>
 #include <odp/helper/ip.h>
 #include <stdint.h>
+#include<stdarg.h>
 
 /**
  * @addtogroup odph_cli ODPH CLI
@@ -127,6 +128,25 @@ int odph_cli_start(void);
  * @retval <0 Failure
  */
 int odph_cli_stop(void);
+
+/**
+ * Log to CLI
+ *
+ * Mainly for it to be used by app specific log functions in the form
+ * of LOG(level, fmt, ...) where level is often an enum type and differs
+ * in applications. For example, a function can be defined in the app specific
+ * LOG form (app_log_level_t level, const char *fmt, ...), inside which
+ * level is made unused and odph_cli_log_va is called. This new function can
+ * then be used to replace the app specific LOG function in order to print to
+ * CLI client instead of local terminal.
+ *
+ * @param fmt printf-style message format
+ * @param in_args variadic arguments
+ * @return On success, the number of characters printed or buffered, without
+ *         accounting for any line feed conversions. If an error is encountered,
+ *         a negative value is returned.
+ */
+int odph_cli_log_va(const char *fmt, va_list in_args);
 
 /**
  * Print to CLI
