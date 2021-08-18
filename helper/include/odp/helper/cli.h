@@ -42,6 +42,14 @@ extern "C" {
  */
 typedef void (*odph_cli_user_cmd_func_t)(int argc, char *argv[]);
 
+/**
+ * CLI server thread initialization function type.
+ *
+ * The server thread initialization function is called immediately after the
+ * server thread has been created at odph_cli_start().
+ */
+typedef int(*odph_cli_server_init_func_t) (void *arg);
+
 /** ODP CLI server parameters */
 typedef struct {
 	/**
@@ -55,6 +63,10 @@ typedef struct {
 	uint32_t max_user_commands;
 	/** Hostname to be displayed as the first part of the prompt. */
 	const char *hostname;
+        /** Optional server thread initialization function. Default is 0. */
+        odph_cli_server_init_func_t server_init_fn;
+        /** Argument for server_init_fn function. Default is 0. */
+        void *server_init_fn_arg;
 } odph_cli_param_t;
 
 /**

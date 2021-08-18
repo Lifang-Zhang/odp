@@ -58,6 +58,8 @@ static const odph_cli_param_t param_default = {
 	.port = 55555,
 	.max_user_commands = 50,
 	.hostname = "ODP",
+	.server_init_fn = 0,
+	.server_init_fn_arg = 0,
 };
 
 void odph_cli_param_init(odph_cli_param_t *param)
@@ -542,6 +544,13 @@ static int cli_server(void *arg ODP_UNUSED)
 
 	if (!shm) {
 		ODPH_ERR("Error: shm %s not found\n", shm_name);
+		return -1;
+	}
+
+	/* Call thread initialization function if it is provided by the user. */
+	if (shm->cli_param.server_init_fn &&
+	    shm->cli_param.server_init_fn(shm->cli_param.server_init_fn_arg)) {
+		ODPH_ERR("Error: server_init_fn() failed\n");
 		return -1;
 	}
 
