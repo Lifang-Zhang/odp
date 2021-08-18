@@ -71,14 +71,14 @@ typedef struct {
 	uint32_t max_user_commands;
 	/** Hostname to be displayed as the first part of the prompt. */
 	const char *hostname;
-        /** Optional server thread initialization function. Default is 0. */
-        odph_cli_server_init_func_t server_init_fn;
-        /** Argument for server_init_fn function. Default is 0. */
-        void *server_init_fn_arg;
-        /** Optional server thread termination function. Default is 0. */
-        odph_cli_server_term_func_t server_term_fn;
-        /** Argument for server_term_fn function. Default is 0. */
-        void *server_term_fn_arg;
+	/** Optional server thread initialization function. Default is 0. */
+	odph_cli_server_init_func_t server_init_fn;
+	/** Argument for server_init_fn function. Default is 0. */
+	void *server_init_fn_arg;
+	/** Optional server thread termination function. Default is 0. */
+	odph_cli_server_term_func_t server_term_fn;
+	/** Argument for server_term_fn function. Default is 0. */
+	void *server_term_fn_arg;
 } odph_cli_param_t;
 
 /**
