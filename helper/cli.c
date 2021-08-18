@@ -45,6 +45,7 @@ typedef struct {
 	odp_spinlock_t api_lock;
 	odph_thread_t thr_server;
 	odp_instance_t instance;
+	odph_cli_param_t cli_param;
 	struct sockaddr_in addr;
 	uint32_t max_user_commands;
 	uint32_t num_user_commands;
@@ -120,6 +121,8 @@ int odph_cli_init(odp_instance_t instance, const odph_cli_param_t *param)
 	}
 
 	shm->max_user_commands = param->max_user_commands;
+
+	shm->cli_param = *param;
 
 	return 0;
 }
