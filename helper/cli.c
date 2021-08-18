@@ -57,6 +57,7 @@ static const odph_cli_param_t param_default = {
 	.address = "127.0.0.1",
 	.port = 55555,
 	.max_user_commands = 50,
+	.hostname = "ODP",
 };
 
 void odph_cli_param_init(odph_cli_param_t *param)
@@ -369,7 +370,7 @@ static struct cli_def *create_cli(cli_shm_t *shm)
 
 	cli = cli_init();
 	cli_set_banner(cli, NULL);
-	cli_set_hostname(cli, "ODP");
+	cli_set_hostname(cli, shm->cli_param.hostname);
 
 	c = cli_register_command(cli, NULL, "call", NULL,
 				 PRIVILEGE_UNPRIVILEGED, MODE_EXEC,
