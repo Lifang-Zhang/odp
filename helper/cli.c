@@ -47,7 +47,6 @@ typedef struct {
 	odp_instance_t instance;
 	odph_cli_param_t cli_param;
 	struct sockaddr_in addr;
-	uint32_t max_user_commands;
 	uint32_t num_user_commands;
 	user_cmd_t user_cmd[0];
 } cli_shm_t;
@@ -120,8 +119,6 @@ int odph_cli_init(odp_instance_t instance, const odph_cli_param_t *param)
 		break;
 	}
 
-	shm->max_user_commands = param->max_user_commands;
-
 	shm->cli_param = *param;
 
 	return 0;
@@ -147,7 +144,7 @@ int odph_cli_register_command(const char *name, odph_cli_user_cmd_func_t func,
 	}
 	odp_spinlock_unlock(&shm->lock);
 
-	if (shm->num_user_commands >= shm->max_user_commands) {
+	if (shm->num_user_commands >= shm->cli_param.max_user_commands) {
 		ODPH_ERR("Error: maximum number of user commands already registered\n");
 		goto error;
 	}
