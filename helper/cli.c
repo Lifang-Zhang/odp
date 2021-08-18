@@ -60,6 +60,8 @@ static const odph_cli_param_t param_default = {
 	.hostname = "ODP",
 	.server_init_fn = 0,
 	.server_init_fn_arg = 0,
+	.server_term_fn = 0,
+	.server_term_fn_arg = 0,
 };
 
 void odph_cli_param_init(odph_cli_param_t *param)
@@ -650,6 +652,13 @@ static int cli_server(void *arg ODP_UNUSED)
 	}
 
 	cli_done(cli);
+
+	/* Call thread termination function if it is provided by the user. */
+	if (shm->cli_param.server_term_fn &&
+	    shm->cli_param.server_term_fn(shm->cli_param.server_term_fn_arg)) {
+		ODPH_ERR("Error: server_term_fn() failed\n");
+		return -1;
+	}
 
 	return 0;
 }
