@@ -96,6 +96,21 @@ static void my_cmd(int argc, char *argv[])
 		odph_cli_log("argv[%d]: %s\n", i, argv[i]);
 }
 
+static void list_cmd_all(int argc, char *argv[])
+{
+	odph_cli_log("%s(%d): %s\n", __FILE__, __LINE__, __func__);
+	for (int i = 0; i < argc; i++)
+		odph_cli_log("argv[%d]: %s\n", i, argv[i]);
+}
+
+static void list_cmd_one(int argc, char *argv[])
+{
+	odph_cli_log("%s(%d): %s\n", __FILE__, __LINE__, __func__);
+	for (int i = 0; i < argc; i++)
+		odph_cli_log("argv[%d]: %s\n", i, argv[i]);
+}
+
+
 int main(int argc, char *argv[])
 {
 	signal(SIGINT, sig_handler);
@@ -155,7 +170,20 @@ int main(int argc, char *argv[])
 	}
 
 	/* Register user command. */
-	if (odph_cli_register_command("my_command", my_cmd,
+	if (odph_cli_register_command("list", "all", list_cmd_all,
+				      "Example user command.")) {
+		ODPH_ERR("Registering user command failed.\n");
+		exit(EXIT_FAILURE);
+	}
+	/* Register user command. */
+	if (odph_cli_register_command("list", "one", list_cmd_one,
+				      "Example user command.")) {
+		ODPH_ERR("Registering user command failed.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	/* Register user command. */
+	if (odph_cli_register_command(NULL, "my_command", my_cmd,
 				      "Example user command.")) {
 		ODPH_ERR("Registering user command failed.\n");
 		exit(EXIT_FAILURE);

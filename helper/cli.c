@@ -26,12 +26,19 @@ enum {
 
 #define MAX_NAME_LEN 20
 #define MAX_HELP_LEN 100
+#define MAX_PARENT_CMDS 10
 
 typedef struct {
 	odph_cli_user_cmd_func_t fn;
+	char parent_name[MAX_NAME_LEN];
 	char name[MAX_NAME_LEN];
 	char help[MAX_HELP_LEN];
 } user_cmd_t;
+
+typedef struct {
+	char name[MAX_NAME_LEN];
+	struct cli_command *cmd;
+} parent_cmd_name_map_t;
 
 typedef struct {
 	volatile int cli_fd;
@@ -47,6 +54,11 @@ typedef struct {
 	odp_instance_t instance;
 	odph_cli_param_t cli_param;
 	struct sockaddr_in addr;
+	uint32_t num_parent_commands;
+	/** The mapping of parent command name and its coresponding cli command.
+	 * The parent names in this array are unique.
+	 */
+	parent_cmd_name_map_t parent_cmd_name_map[MAX_PARENT_CMDS];
 	uint32_t num_user_commands;
 	user_cmd_t user_cmd[0];
 } cli_shm_t;
@@ -62,6 +74,7 @@ static const odph_cli_param_t param_default = {
 	.server_init_fn_arg = 0,
 	.server_term_fn = 0,
 	.server_term_fn_arg = 0,
+	.max_parent_commands = 10,
 };
 
 void odph_cli_param_init(odph_cli_param_t *param)
@@ -129,8 +142,8 @@ int odph_cli_init(odp_instance_t instance, const odph_cli_param_t *param)
 	return 0;
 }
 
-int odph_cli_register_command(const char *name, odph_cli_user_cmd_func_t func,
-			      const char *help)
+int odph_cli_register_command(const char *parent, const char *name,
+			      odph_cli_user_cmd_func_t func, const char *help)
 {
 	cli_shm_t *shm = shm_lookup();
 
@@ -154,9 +167,38 @@ int odph_cli_register_command(const char *name, odph_cli_user_cmd_func_t func,
 		goto error;
 	}
 
+	if (shm->num_parent_commands >= shm->cli_param.max_parent_commands) {
+		ODPH_ERR("Error: maximum number of parent commands already registered\n");
+		goto error;
+	}
+
 	user_cmd_t *cmd = &shm->user_cmd[shm->num_user_commands];
 
 	cmd->fn = func;
+
+	/** Add parent command names to parent_cmd_name_map */
+	if (parent) {
+		if (strlen(parent) >= MAX_NAME_LEN - 1) {
+			ODPH_ERR("Error: parent command name too long\n");
+			goto error;
+		}
+		strcpy(cmd->parent_name, parent);
+
+		uint32_t i = 0;
+		bool added = false;
+
+		for (i = 0; i < shm->num_parent_commands; i++) {
+			if (strcmp(shm->parent_cmd_name_map[i].name, name) == 0) {
+				added = true;
+				break;
+			}
+		}
+
+		if (!added) {
+			strcpy(shm->parent_cmd_name_map[i].name, parent);
+			shm->num_parent_commands++;
+		}
+	}
 
 	if (strlen(name) >= MAX_NAME_LEN - 1) {
 		ODPH_ERR("Error: command name too long\n");
@@ -358,13 +400,30 @@ static int cmd_user_cmd(struct cli_def *cli ODP_UNUSED, const char *command,
 	}
 
 	for (uint32_t i = 0; i < shm->num_user_commands; i++) {
-		if (!strcasecmp(command, shm->user_cmd[i].name)) {
+		/* command after command expansion includes parent command name,
+		 * while shm->user_cmd[i].name stores only child command name.
+		 */
+		if (strstr(command, shm->user_cmd[i].name)) {
 			shm->user_cmd[i].fn(argc, argv);
 			break;
 		}
 	}
 
 	return CLI_OK;
+}
+
+/* Map parent command name to cli command. */
+static struct cli_command *parent_name_to_cmd(cli_shm_t *shm, char *name)
+{
+	if (!strlen(name))
+		return NULL;
+
+	for (uint32_t j = 0; j < shm->num_parent_commands; j++) {
+		if (!strcmp(shm->parent_cmd_name_map[j].name, name))
+			return shm->parent_cmd_name_map[j].cmd;
+	}
+
+	return NULL;
 }
 
 static struct cli_def *create_cli(cli_shm_t *shm)
@@ -410,8 +469,24 @@ static struct cli_def *create_cli(cli_shm_t *shm)
 			     cmd_call_odp_sys_info_print,
 			     PRIVILEGE_UNPRIVILEGED, MODE_EXEC, NULL);
 
+	/* Register all parent commands. */
+	for (uint32_t i = 0; i < shm->num_parent_commands; i++) {
+		parent_cmd_name_map_t *parent_cmd_name = &shm->parent_cmd_name_map[i];
+
+		parent_cmd_name->cmd = cli_register_command(cli, NULL,
+							    parent_cmd_name->name,
+							    NULL,
+							    PRIVILEGE_UNPRIVILEGED,
+							    MODE_EXEC,
+							    "Call ODP API function.");
+	}
+
 	for (uint32_t i = 0; i < shm->num_user_commands; i++) {
-		cli_register_command(cli, NULL, shm->user_cmd[i].name,
+		struct cli_command *prt_cmd = NULL;
+
+		prt_cmd = parent_name_to_cmd(shm, shm->user_cmd[i].parent_name);
+
+		cli_register_command(cli, prt_cmd, shm->user_cmd[i].name,
 				     cmd_user_cmd, PRIVILEGE_UNPRIVILEGED,
 				     MODE_EXEC, shm->user_cmd[i].help);
 	}

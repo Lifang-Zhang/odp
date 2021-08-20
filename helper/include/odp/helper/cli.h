@@ -79,6 +79,8 @@ typedef struct {
 	odph_cli_server_term_func_t server_term_fn;
 	/** Argument for server_term_fn function. Default is 0. */
 	void *server_term_fn_arg;
+	/** Maximum number of parent commands. Default is 10. */
+	uint32_t max_parent_commands;
 } odph_cli_param_t;
 
 /**
@@ -125,8 +127,8 @@ int odph_cli_init(odp_instance_t instance, const odph_cli_param_t *param);
  * @retval 0 Success
  * @retval <0 Failure
  */
-int odph_cli_register_command(const char *name, odph_cli_user_cmd_func_t func,
-			      const char *help);
+int odph_cli_register_command(const char *parent, const char *name,
+			      odph_cli_user_cmd_func_t func, const char *help);
 
 /**
  * Start CLI server
