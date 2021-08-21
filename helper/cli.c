@@ -400,10 +400,14 @@ static int cmd_user_cmd(struct cli_def *cli ODP_UNUSED, const char *command,
 	}
 
 	for (uint32_t i = 0; i < shm->num_user_commands; i++) {
-		/* command after command expansion includes parent command name,
-		 * while shm->user_cmd[i].name stores only child command name.
+		/* command after command expansion includes parent command name.
 		 */
-		if (strstr(command, shm->user_cmd[i].name)) {
+		char user_cmd[2 * MAX_NAME_LEN] = {0};
+
+		snprintf(user_cmd, sizeof(user_cmd), "%s %s",
+			 shm->user_cmd[i].parent_name, shm->user_cmd[i].name);
+
+		if (!strcasecmp(command, user_cmd)) {
 			shm->user_cmd[i].fn(argc, argv);
 			break;
 		}

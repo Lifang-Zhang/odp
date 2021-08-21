@@ -103,7 +103,7 @@ static void list_cmd_all(int argc, char *argv[])
 		odph_cli_log("argv[%d]: %s\n", i, argv[i]);
 }
 
-static void list_cmd_one(int argc, char *argv[])
+static void print_cmd_all(int argc, char *argv[])
 {
 	odph_cli_log("%s(%d): %s\n", __FILE__, __LINE__, __func__);
 	for (int i = 0; i < argc; i++)
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	/* Register user command. */
-	if (odph_cli_register_command("list", "one", list_cmd_one,
+	if (odph_cli_register_command("print", "all", print_cmd_all,
 				      "Example user command.")) {
 		ODPH_ERR("Registering user command failed.\n");
 		exit(EXIT_FAILURE);
