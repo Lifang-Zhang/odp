@@ -109,10 +109,10 @@ int odph_cli_init(odp_instance_t instance, const odph_cli_param_t *param);
 /**
  * Register a user defined command
  *
- * Register a command with a name, function, and an optional help text. The
- * registered command is displayed in the output of the "help" command. When the
- * command is invoked by the CLI client, the registered function is called with
- * the parameters entered by the CLI client user.
+ * Register a command with an optional parent name, name, function, and an
+ * optional help text. The registered command is displayed in the output of the
+ * "help" command. When the command is invoked by the CLI client, the registered
+ * function is called with the parameters entered by the CLI client user.
  *
  * Command names are case-insensitive. In the CLI client, they are displayed in
  * the case they were registered in, but they may be invoked using any case.
@@ -120,6 +120,7 @@ int odph_cli_init(odp_instance_t instance, const odph_cli_param_t *param);
  * This function should be called after odph_cli_init() and before
  * odph_cli_start().
  *
+ * @param parent Optional parent command name (case-insensitive). Maybe NULL
  * @param name Command name (case-insensitive)
  * @param func Command function
  * @param help Help or description for the command. This appears in the output
