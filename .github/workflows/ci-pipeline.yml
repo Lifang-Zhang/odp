@@ -74,10 +74,18 @@ jobs:
             conf: '--enable-lto'
           - cc: clang
             conf: '--enable-lto --enable-abi-compat'
+    container:
+      image: $CONTAINER_NAMESPACE/odp-ci-${OS}-${ARCH}
+      env:
+        CC: "${{matrix.cc}}"
+        CONF: "${{matrix.conf}}"
+      volumes:
+        - ${pwd}:/odp --privileged
+      options: -i -v  --shm-size 8g
     steps:
       - uses: actions/checkout@v2
-      - run: sudo docker run -i -v `pwd`:/odp --privileged --shm-size 8g -e CC="${{matrix.cc}}"
-               -e CONF="${{matrix.conf}}" $CONTAINER_NAMESPACE/odp-ci-${OS}-${ARCH} /odp/scripts/ci/build_${ARCH}.sh
+      - run:
+          /odp/scripts/ci/build_${ARCH}.sh
 
   Build_arm64:
     runs-on: ubuntu-18.04
