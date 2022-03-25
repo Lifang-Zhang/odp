@@ -54,3 +54,6 @@ missing
 perf.data*
 tags
 test-driver
+.vscode
+build/
+*.code-workspace
