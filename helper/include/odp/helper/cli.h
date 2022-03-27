@@ -23,6 +23,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 /**
  * @addtogroup odph_cli ODPH CLI
@@ -116,10 +117,12 @@ int odph_cli_register_command(const char *name, odph_cli_user_cmd_func_t func,
  *
  * Returns only on a fatal error, or after odph_cli_stop() is called.
  *
+ * @param is_process CLI server is going to run in process mode or not
+ *
  * @retval 0 Success
  * @retval <0 Failure
  */
-int odph_cli_run(void);
+int odph_cli_run(bool is_process);
 
 /**
  * Stop CLI server

@@ -98,8 +98,10 @@ static void my_cmd(int argc, char *argv[])
 
 static int cli_server(void *arg ODP_UNUSED)
 {
+	bool is_process = *(bool *)arg;
+
 	/* Run CLI server. */
-	if (odph_cli_run()) {
+	if (odph_cli_run(is_process)) {
 		ODPH_ERR("odph_cli_run() failed.\n");
 		exit(EXIT_FAILURE);
 	}
@@ -107,8 +109,27 @@ static int cli_server(void *arg ODP_UNUSED)
 	return 0;
 }
 
+static bool is_process_mode(int argc, char *argv[])
+{
+	char *env;
+	int i;
+
+	env = getenv("ODPH_PROC_MODE");
+	if (env && atoi(env))
+		return true;
+
+	for (i = 0; i < argc; i++) {
+		if (strcmp(argv[i], "--odph_proc") == 0)
+			return true;
+	}
+
+	return false;
+}
+
 int main(int argc, char *argv[])
 {
+	bool is_process = is_process_mode(argc, argv);
+
 	signal(SIGINT, sig_handler);
 
 	odph_helper_options_t helper_options;
@@ -191,6 +212,7 @@ int main(int argc, char *argv[])
 	odph_thread_param_init(&thr_param);
 	thr_param.thr_type = ODP_THREAD_CONTROL;
 	thr_param.start = cli_server;
+	thr_param.arg = &is_process;
 
 	memset(&thr_server, 0, sizeof(thr_server));
 

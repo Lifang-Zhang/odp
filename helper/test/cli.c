@@ -9,7 +9,9 @@
 
 static int cli_server(void *arg ODP_UNUSED)
 {
-	if (odph_cli_run()) {
+	bool is_process = *(bool *)arg;
+
+	if (odph_cli_run(is_process)) {
 		ODPH_ERR("odph_cli_run() failed.\n");
 		exit(EXIT_FAILURE);
 	}
@@ -17,17 +19,37 @@ static int cli_server(void *arg ODP_UNUSED)
 	return 0;
 }
 
+static bool is_process_mode(int argc, char *argv[])
+{
+	char *env;
+	int i;
+
+	env = getenv("ODPH_PROC_MODE");
+	if (env && atoi(env))
+		return true;
+
+	for (i = 0; i < argc; i++) {
+		if (strcmp(argv[i], "--odph_proc") == 0)
+			return true;
+	}
+
+	return false;
+}
+
 int main(int argc, char *argv[])
 {
 	odp_instance_t instance;
 	odph_helper_options_t helper_options;
 	odp_init_t init_param;
+	bool is_process;
 
 	argc = odph_parse_options(argc, argv);
 	if (odph_options(&helper_options)) {
 		ODPH_ERR("Error: reading ODP helper options failed.\n");
 		exit(EXIT_FAILURE);
 	}
+
+	is_process = is_process_mode(argc, argv);
 
 	odp_init_param_init(&init_param);
 	init_param.mem_model = helper_options.mem_model;
@@ -70,6 +92,7 @@ int main(int argc, char *argv[])
 	odph_thread_param_init(&thr_param);
 	thr_param.thr_type = ODP_THREAD_CONTROL;
 	thr_param.start = cli_server;
+	thr_param.arg = &is_process;
 
 	memset(&thr_server, 0, sizeof(thr_server));
 

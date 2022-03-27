@@ -17,6 +17,8 @@
 #include <poll.h>
 #include <stdio.h>
 #include <strings.h>
+#include <signal.h>
+#include <errno.h>
 
 /* Socketpair socket roles. */
 enum {
@@ -667,8 +669,44 @@ static int cli_server(cli_shm_t *shm)
 	return 0;
 }
 
-int odph_cli_run(void)
+static void close_cli_fd(int signo)
 {
+	(void)signo;
+
+	cli_shm_t *shm = shm_lookup();
+
+	odp_spinlock_lock(&shm->lock);
+	close(shm->cli_fd);
+	shm->cli_fd = -1;
+	odp_spinlock_unlock(&shm->lock);
+}
+
+static inline int process_signal_setup(void)
+{
+	struct sigaction sa = {0};
+
+	sigemptyset(&sa.sa_mask);
+	sa.sa_handler = close_cli_fd;
+	if (sigaction(SIGINT, &sa, NULL) == -1) {
+		ODPH_ERR("sigaction() fails (errno(%i)=%s)",
+			 errno, strerror(errno));
+		return -1;
+	}
+
+	return 0;
+}
+
+int odph_cli_run(bool is_process)
+{
+	/*
+	 * In process mode, set up a process specific signal handler for SIGINT
+	 * to close the socket in order to break cli_loop(). Since closing the
+	 * socket in odph_cli_stop() of the parent process does not affect the
+	 * socket in cli process.
+	 */
+	if (is_process && process_signal_setup())
+		return -1;
+
 	cli_shm_t *shm = shm_lookup();
 
 	if (!shm) {
