@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <signal.h>
+#include <unistd.h>
 
 typedef struct {
 	int time;
@@ -88,6 +89,16 @@ static void sig_handler(int signo)
 	shutdown_sig = 1;
 }
 
+/**
+ * Signal handler for SIGUSR2 (child process sends when odph_cli_run() fails).
+ */
+static void sigusr2_handler(int signo)
+{
+	(void)signo;
+
+	exit(EXIT_FAILURE);
+}
+
 static void my_cmd(int argc, char *argv[])
 {
 	odph_cli_log("%s(%d): %s\n", __FILE__, __LINE__, __func__);
@@ -103,7 +114,16 @@ static int cli_server(void *arg ODP_UNUSED)
 	/* Run CLI server. */
 	if (odph_cli_run(is_process)) {
 		ODPH_ERR("odph_cli_run() failed.\n");
-		exit(EXIT_FAILURE);
+		/*
+		 * Can't use exit in process mode with SIGCHLD signal handler set
+		 * in parent process, since normal exit would also be catched by
+		 * SIGCHLD handler, which won't terminate cli and odp properly.
+		 *
+		 */
+		if (is_process)
+			kill(getppid(), SIGUSR2);
+		else
+			exit(EXIT_FAILURE);
 	}
 
 	return 0;
@@ -131,6 +151,8 @@ int main(int argc, char *argv[])
 	bool is_process = is_process_mode(argc, argv);
 
 	signal(SIGINT, sig_handler);
+	if (is_process)
+		signal(SIGUSR2, sigusr2_handler);
 
 	odph_helper_options_t helper_options;
 
