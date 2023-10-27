@@ -229,6 +229,7 @@ __LIB__libodp_linux_la_SOURCES = \
 			   odp_ishmphy.c \
 			   odp_ishmpool.c \
 			   odp_libconfig.c \
+			   odp_ml.c \
 			   odp_name_table.c \
 			   odp_packet.c \
 			   odp_packet_vector.c \
