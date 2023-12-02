@@ -1,0 +1,6 @@
+model_explorer
+simple_linear
+style_transfer
+mnist
+*.log
+*.trs
