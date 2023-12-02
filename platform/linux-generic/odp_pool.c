@@ -1258,6 +1258,10 @@ int odp_pool_info(odp_pool_t pool_hdl, odp_pool_info_t *info)
 		info->dma_pool_param.uarea_size = pool->params.buf.uarea_size;
 		info->dma_pool_param.cache_size = pool->params.buf.cache_size;
 
+	} else if (pool->type_2 == ODP_POOL_ML_COMPL) {
+		info->ml_pool_param.num        = pool->params.buf.num;
+		info->ml_pool_param.uarea_size = pool->params.buf.uarea_size;
+		info->ml_pool_param.cache_size = pool->params.buf.cache_size;
 	} else {
 		info->params = pool->params;
 	}

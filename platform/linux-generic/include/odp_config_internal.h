@@ -25,10 +25,10 @@ extern "C" {
 #define CONFIG_PKTIO_ENTRIES 64
 
 /*
- * Pools reserved for internal usage, 1 for IPsec status events and one per packet
- * I/O for TX completion
+ * Pools reserved for internal usage, 1 for IPsec status events, one for ML to
+ * combine segments and one per packet I/O for TX completion
  */
-#define CONFIG_INTERNAL_POOLS (1 + CONFIG_PKTIO_ENTRIES)
+#define CONFIG_INTERNAL_POOLS (1 + 1 + CONFIG_PKTIO_ENTRIES)
 
 /*
  * Maximum number of pools.
@@ -198,6 +198,18 @@ extern "C" {
 
 /* Enable timer scan performance benchmark. This works with inline enabled. */
 #define CONFIG_TIMER_PROFILE_INLINE 0
+
+/* Maximum number of ML models that can be created or loaded. */
+#define CONFIG_ML_MAX_MODELS 4
+
+/* Maximum number of inputs for a ML model. */
+#define CONFIG_ML_MAX_INPUTS 4
+
+/* Maximum number of outputs for a ML model. */
+#define CONFIG_ML_MAX_OUTPUTS 4
+
+/* Maximum number of concurrent inferences that can be performed for a ML model. */
+#define CONFIG_ML_MAX_CONCUR_INFERS 2
 
 #ifdef __cplusplus
 }
