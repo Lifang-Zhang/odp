@@ -13,6 +13,7 @@ ODP_MODULES = atomic \
 	      init \
 	      ipsec \
 	      lock \
+	      ml \
 	      queue \
 	      packet \
 	      pktio \
@@ -60,6 +61,7 @@ TESTS = \
 	ipsec/ipsec_inline_in$(EXEEXT) \
 	ipsec/ipsec_inline_out$(EXEEXT) \
 	lock/lock_main$(EXEEXT) \
+	ml/ml_main$(EXEEXT) \
 	packet/packet_main$(EXEEXT) \
 	pktio/pktio_main$(EXEEXT) \
 	pool/pool_main$(EXEEXT) \
