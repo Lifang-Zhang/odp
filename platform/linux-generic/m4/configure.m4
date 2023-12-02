@@ -32,6 +32,7 @@ m4_include([platform/linux-generic/m4/odp_dpdk.m4])
 m4_include([platform/linux-generic/m4/odp_wfe.m4])
 m4_include([platform/linux-generic/m4/odp_xdp.m4])
 m4_include([platform/linux-generic/m4/odp_ml.m4])
+m4_include([platform/linux-generic/example/m4/libpng.m4])
 ODP_EVENT_VALIDATION
 ODP_SCHEDULER
 
@@ -48,6 +49,7 @@ AS_VAR_APPEND([PLAT_CFG_TEXT], ["
 	pcapng:                 ${have_pcapng}
 	wfe_locks:              ${use_wfe_locks}
 	ml_support:             ${ml_support}
+	png_available:          ${png_available}
 	default_config_path:    ${default_config_path}"])
 
 # Ignore Clang specific errors about fields with variable sized type not at the
@@ -61,6 +63,8 @@ AM_CONDITIONAL([PLATFORM_IS_LINUX_GENERIC],
 AC_CONFIG_FILES([platform/linux-generic/Makefile
 		 platform/linux-generic/libodp-linux.pc
 		 platform/linux-generic/dumpconfig/Makefile
+		 platform/linux-generic/example/Makefile
+		 platform/linux-generic/example/ml/Makefile
 		 platform/linux-generic/test/Makefile
 		 platform/linux-generic/test/example/Makefile
 		 platform/linux-generic/test/example/classifier/Makefile
