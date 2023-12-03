@@ -5569,6 +5569,13 @@ sub process {
 			    $var !~ /\bSCN[diux]16/ &&
 			    $var !~ /\bSCN[diux]32/ &&
 			    $var !~ /\bSCN[diux]64/ &&
+#Ignore onnxruntime CamelCase usage
+			    $var !~ /\bOrt*/ &&
+			    $var !~ /\bort_api->*/ &&
+			    $var !~ /\bGetApi/ &&
+			    $var !~ /\bExecutionMode/ &&
+			    $var !~ /\bGraphOptimizationLevel/ &&
+			    $var !~ /\bONNX*/ &&
 #Ignore SI style variants like nS, mV and dB
 #(ie: max_uV, regulator_min_uA_show, RANGE_mA_VALUE)
 			    $var !~ /^(?:[a-z0-9_]*|[A-Z0-9_]*)?_?[a-z][A-Z](?:_[a-z0-9_]+|_[A-Z0-9_]+)?$/ &&
