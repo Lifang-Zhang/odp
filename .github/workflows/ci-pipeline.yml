@@ -6,14 +6,14 @@ env:
   CC: gcc
   CONTAINER_NAMESPACE: ghcr.io/lifang-zhang/odp-docker-images
   OS: ubuntu_20.04
-  IMG_TAG_VER: ml-docker
+  IMG_TAG_VER: ml-non-x86-dockers
 
 jobs:
   Build_arm64:
     runs-on: ubuntu-20.04
     env:
       ARCH: arm64
-      CONF: "--enable-dpdk-shared"
+      CONF: "--enable-dpdk-shared --with-ort-path=/usr/local/"
     strategy:
       fail-fast: false
       matrix:
@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo docker run -i -v `pwd`:/odp --privileged --shm-size 8g -e CC="${{matrix.cc}}"
-               -e CONF="${CONF} ${{matrix.conf}}" $CONTAINER_NAMESPACE/odp-ci-${OS}-${ARCH} /odp/scripts/ci/build_${ARCH}.sh
+               -e CONF="${CONF} ${{matrix.conf}}" $CONTAINER_NAMESPACE/odp-ci-${OS}-${ARCH}:${IMG_TAG_VER} /odp/scripts/ci/build_${ARCH}.sh
       - if: ${{ failure() }}
         uses: ./.github/actions/build-failure-log
 
@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo docker run -i -v `pwd`:/odp --privileged --shm-size 8g -e CC="${{matrix.cc}}"
-               -e CONF="${{matrix.conf}}" $CONTAINER_NAMESPACE/odp-ci-${OS}-${ARCH} /odp/scripts/ci/build_${ARCH}.sh
+               -e CONF="${{matrix.conf}}" $CONTAINER_NAMESPACE/odp-ci-${OS}-${ARCH}:${IMG_TAG_VER} /odp/scripts/ci/build_${ARCH}.sh
       - if: ${{ failure() }}
         uses: ./.github/actions/build-failure-log
 

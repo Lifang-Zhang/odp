@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+uname -m
+
 export TARGET_ARCH=aarch64-linux-gnu
 if [[ $(uname -m) =~ ^(arm64|aarch64)$ ]]; then
   export BUILD_ARCH=aarch64-linux-gnu
@@ -13,7 +15,7 @@ if [ "$TARGET_ARCH" == "$BUILD_ARCH" ]; then
 	fi
 
 	# Required by CentOS and Rocky Linux to find DPDK install
-	export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib64/pkgconfig
+	export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig/
 
 else
 	# Cross compilation
@@ -25,11 +27,11 @@ else
 		export CXX="${TARGET_ARCH}-g++"
 	fi
 
-	export CPPFLAGS="-I/usr/include/${TARGET_ARCH}/dpdk"
+	export CPPFLAGS="-I/usr/include/${TARGET_ARCH}/dpdk:/usr/local/include/"
 
 	# Use target libraries
 	export PKG_CONFIG_PATH=
-	export PKG_CONFIG_LIBDIR=/usr/lib/${TARGET_ARCH}/pkgconfig:/usr/local/lib/${TARGET_ARCH}/pkgconfig
+	export PKG_CONFIG_LIBDIR=/usr/lib/${TARGET_ARCH}/pkgconfig:/usr/local/lib/${TARGET_ARCH}/pkgconfig:/usr/local/lib/pkgconfig/
 fi
 
 # ARMv8 crypto
