@@ -8,7 +8,7 @@ AC_ARG_WITH([ort-path],
         [ort_path_given=yes
                 ORT_CPPFLAGS="-I$withval/include"
                 ORT_LIBS="-L$withval/lib"
-                ORT_RPATH="-R$withval/lib"],
+                ORT_RPATH="-Wl,-rpath,$withval/lib"],
         [])
 
 ##########################################################################
