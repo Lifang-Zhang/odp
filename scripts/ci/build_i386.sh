@@ -10,10 +10,10 @@ else
 	export CXXFLAGS="-m32"
 	export LDFLAGS="-m32"
 fi
-export CPPFLAGS="-I/usr/include/i386-linux-gnu/dpdk"
+export CPPFLAGS="-I/usr/include/i386-linux-gnu/dpdk:/usr/local/include/"
 
 # Use target libraries
 export PKG_CONFIG_PATH=
-export PKG_CONFIG_LIBDIR=/usr/lib/i386-linux-gnu/pkgconfig
+export PKG_CONFIG_LIBDIR=/usr/lib/i386-linux-gnu/pkgconfig:/usr/local/lib/pkgconfig/
 
 exec "$(dirname "$0")"/build.sh

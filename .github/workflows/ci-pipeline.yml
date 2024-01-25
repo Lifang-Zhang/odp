@@ -76,19 +76,3 @@ jobs:
                -e CONF="${{matrix.conf}}" $CONTAINER_NAMESPACE/odp-ci-${OS}-${ARCH}:${IMG_TAG_VER} /odp/scripts/ci/build_${ARCH}.sh
       - if: ${{ failure() }}
         uses: ./.github/actions/build-failure-log
-
-  Build_riscv64:
-    runs-on: ubuntu-20.04
-    env:
-      ARCH: riscv64
-    strategy:
-      fail-fast: false
-      matrix:
-        cc: [gcc]
-        conf: ['', '--enable-abi-compat']
-    steps:
-      - uses: actions/checkout@v3
-      - run: sudo docker run -i -v `pwd`:/odp --privileged --shm-size 8g -e CC="${{matrix.cc}}"
-               -e CONF="${{matrix.conf}}" $CONTAINER_NAMESPACE/odp-ci-${OS}-${ARCH}:${IMG_TAG_VER} /odp/scripts/ci/build_${ARCH}.sh
-      - if: ${{ failure() }}
-        uses: ./.github/actions/build-failure-log

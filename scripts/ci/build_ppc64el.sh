@@ -15,10 +15,10 @@ else
 	export CC="${TARGET_ARCH}-gcc"
 	export CXX="${TARGET_ARCH}-g++"
 fi
-export CPPFLAGS="-I/usr/include/${TARGET_ARCH}/dpdk"
+export CPPFLAGS="-I/usr/include/${TARGET_ARCH}/dpdk:/usr/local/include/"
 
 # Use target libraries
 export PKG_CONFIG_PATH=
-export PKG_CONFIG_LIBDIR=/usr/lib/${TARGET_ARCH}/pkgconfig
+export PKG_CONFIG_LIBDIR=/usr/lib/${TARGET_ARCH}/pkgconfig:/usr/local/lib/pkgconfig/
 
 exec "$(dirname "$0")"/build.sh

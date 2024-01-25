@@ -17,6 +17,6 @@ export CONF="${CONF} --disable-dpdk"
 
 # Use target libraries
 export PKG_CONFIG_PATH=
-export PKG_CONFIG_LIBDIR=/usr/lib/${TARGET_ARCH}/pkgconfig
+export PKG_CONFIG_LIBDIR=/usr/lib/${TARGET_ARCH}/pkgconfig:/usr/local/lib/pkgconfig/
 
 exec "$(dirname "$0")"/build.sh
