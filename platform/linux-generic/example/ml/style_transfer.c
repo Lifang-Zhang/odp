@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "model_read.h"
 
@@ -242,7 +243,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (MAX_MODEL_SIZE > capa.max_model_size) {
-		printf("Configured max model size %d exceeds max mode size %lu in capa\n",
+		printf("Configured max model size %d exceeds max mode size %" PRIu64 " in capa\n",
 		       MAX_MODEL_SIZE, capa.max_model_size);
 		ret = -1;
 		goto odp_term;
