@@ -226,7 +226,7 @@ int odp_ml_config(const odp_ml_config_t *config)
 	}
 
 	if (config->max_model_size > ML_MAX_MODEL_SIZE) {
-		_ODP_ERR("max_model_size %lu exceeds supported maximum model size %d\n",
+		_ODP_ERR("max_model_size %" PRIu64 " exceeds supported maximum model size %d\n",
 			 config->max_model_size, ML_MAX_MODEL_SIZE);
 		return -1;
 	}
@@ -387,7 +387,7 @@ static int get_shape(int64_t dims[], odp_ml_shape_info_t *shape)
 
 	for (uint32_t i = 0; i < shape->num_dim; i++) {
 		if (dims[i] == 0) {
-			_ODP_ERR("Dimension value: %ld must be at least 1\n", dims[i]);
+			_ODP_ERR("Dimension value: %" PRId64 " must be at least 1\n", dims[i]);
 			return -1;
 		} else if (dims[i] == -1) { /* Symbolic dimension */
 			dyn_cnt++;
@@ -402,7 +402,7 @@ static int get_shape(int64_t dims[], odp_ml_shape_info_t *shape)
 			shape->dim_min[i] = dims[i];
 			shape->dim_max[i] = dims[i];
 		} else {
-			_ODP_ERR("Dimension value: %ld invalid\n", dims[i]);
+			_ODP_ERR("Dimension value: %" PRId64 " invalid\n", dims[i]);
 			return -1;
 		}
 	}
@@ -950,13 +950,13 @@ odp_ml_model_t odp_ml_model_create(const char *name, const odp_ml_model_param_t 
 	}
 
 	if (odp_unlikely(param->size > _odp_ml_glb->ml_config.max_model_size)) {
-		_ODP_ERR("Model size %lu exceeds maximum model size configured %lu\n",
+		_ODP_ERR("Model size %" PRIu64 " exceeds maximum model size configured %" PRIu64 "\n",
 			 param->size, _odp_ml_glb->ml_config.max_model_size);
 		return ODP_ML_MODEL_INVALID;
 	}
 
 	if (odp_unlikely(!param->size || !param->model)) {
-		_ODP_ERR("Invalid model param: param->model: %p, param->size: %lu\n",
+		_ODP_ERR("Invalid model param: param->model: %p, param->size: %" PRIu64 "\n",
 			 param->model, param->size);
 		return ODP_ML_MODEL_INVALID;
 	}
@@ -1297,8 +1297,8 @@ void odp_ml_model_print(odp_ml_model_t model)
 	_ODP_PRINT("----------\n");
 	_ODP_PRINT("  Model handle: 0x%" PRIx64 "\n", odp_ml_model_to_u64(model));
 	_ODP_PRINT("  Name: %s\n", info->name);
-	_ODP_PRINT("  Model version: %ld\n", info->model_version);
-	_ODP_PRINT("  Model interface version: %ld\n", info->interface_version);
+	_ODP_PRINT("  Model version: %" PRIu64 "\n", info->model_version);
+	_ODP_PRINT("  Model interface version: %" PRIu64 "\n", info->interface_version);
 	_ODP_PRINT("  Index: %u\n", info->index);
 	_ODP_PRINT("  Number of inputs: %u\n", info->num_inputs);
 
@@ -2192,7 +2192,7 @@ static int verify_tensor(const OrtValue *tensor, odp_ml_data_type_t expected_typ
 	for (uint32_t i = 0; i < dim_count; i++) {
 		if (dims[i] != shape_arr[i]) {
 			ort_api->ReleaseTensorTypeAndShapeInfo(tensor_info);
-			_ODP_ERR("Shape[%u]: %ld does not match expected: %ld\n",
+			_ODP_ERR("Shape[%u]: %" PRIu64 " does not match expected: %" PRIu64 "\n",
 				 i, dims[i], shape_arr[i]);
 			return -1;
 		}
@@ -2419,7 +2419,7 @@ static int check_output_size(odp_bool_t is_segmented, uint32_t output_idx, uint3
 		/* Make sure tensor data size does not exceed size allocated for
 		 * data->output_seg[seg_idx].addr */
 		if (out_tensor_data_size > data->output_seg[seg_idx].size) {
-			_ODP_ERR("Malloc at least %zu bytes for %dth output tensor\n",
+			_ODP_ERR("Malloc at least %" PRIu64 " bytes for %dth output tensor\n",
 				 out_tensor_data_size, output_idx);
 			return -1;
 		}
@@ -2440,8 +2440,8 @@ static int check_output_size(odp_bool_t is_segmented, uint32_t output_idx, uint3
 	}
 
 	if (out_tensor_data_size > output_size) {
-		_ODP_ERR("Output segments (%lu bytes in total) for %uth output"
-			 " is expected to be at least %lu bytes\n",
+		_ODP_ERR("Output segments (%" PRIu64 " bytes in total) for %uth output"
+			 " is expected to be at least %" PRIu64 " bytes\n",
 			 output_size, output_idx, out_tensor_data_size);
 		return -1;
 	}
